@@ -1,4 +1,4 @@
-# GoldEventAnalyzer
+# dopqLOL-scraping-economic-indicators-
 
 GOLDの経済指標影響分析アプリ (Android/Jetpack Compose)
 
@@ -27,56 +27,54 @@ GOLDの経済指標影響分析アプリ (Android/Jetpack Compose)
 - Room/DataStore
 - Ktor/Retrofit (検討中)
 
-# KissFX 経済指標スクレイパー
+# KissFX 経済指標データ抽出スクリプト
 
 ## 概要
 
-このPythonスクリプトは、外国為替情報サイト「羊飼いのFXブログ」(kissfx.com) から経済指標カレンダーの情報をスクレイピングし、指定された期間のデータを抽出してCSVファイルとして出力します。
+このPythonスクリプトは、外国為替情報サイト「羊飼いのFXブログ」(kissfx.com) の経済指標カレンダーから、指定された期間のデータを取得し、CSVファイルとして整形・出力します。
 
 ## 主な機能
 
--   指定された期間の経済指標データをウェブサイトから取得します。
--   取得したデータから、日付、国名、指標名、重要度などの主要情報を抽出・整形します。
--   日付時刻は日本時間基準で `YYYY.MM.DD HH:MM` 形式で出力します。
--   不要なデータ（例: 単純な数値のみの行など）をフィルタリングします。
--   処理結果をCSVファイル（例: `kissfx_indicators_20200101-20241231.csv`）として保存します。
--   ウェブサイトへの連続アクセスを避けるため、各日付の処理間にランダムな待機時間を設けています。
+-   指定期間における経済指標の予定を kissfx.com から取得します。
+-   取得データから、発表日時 (日本時間 `YYYY.MM.DD HH:MM` 形式)、国名、指標名、重要度などの情報を抽出します。
+-   抽出した情報を整形し、重複を除外した上でCSVファイルとして保存します。
+    -   出力先: プロジェクトルートの `kissfx_data` ディレクトリ
+    -   ファイル名例: `kissfx_data/economic_indicators_20200101-20241231.csv`
+-   ウェブサイトへの過度な負荷を避けるため、日付ごとの処理の間にランダムな待機時間を挿入します。
+-   **(オプション)** HTMLコンテンツの保存機能:
+    -   デバッグや詳細分析を目的として、取得した各日付ページのHTMLを生のまま保存できます。
+    -   この機能はデフォルトで無効化されています。有効にするには、スクリプト内の `get_economic_indicators_for_date` 関数にある `save_html_to_file` 関数の呼び出し部分のコメントを解除してください。
+    -   HTMLファイルも `kissfx_data` ディレクトリに保存されます (例: `kissfx_data/kissfx_raw_YYYYMMDD.html`)。
 
-## 必要なライブラリ / 実行環境
+## 実行環境および必要なライブラリ
 
 -   Python 3.7 以降
--   `requests`
--   `beautifulsoup4`
--   `pandas`
+-   requests
+-   beautifulsoup4
+-   pandas
 
-これらのライブラリは、`pip install requests beautifulsoup4 pandas` コマンドでインストールできます。
+上記ライブラリは、以下のコマンドでインストールできます。
+```bash
+pip install requests beautifulsoup4 pandas
+```
 
-## 使い方
+## 使用方法
 
-1.  **スクリプトの準備:**
-    *   `Workspace_kissfx_indicators.py` ファイルを任意のディレクトリに配置します。
-2.  **日付範囲の設定 (任意):**
-    *   スクリプト内の `if __name__ == "__main__":` ブロックにある以下の部分を編集することで、データ取得期間を変更できます。
-        ```python
-        # --- 日付範囲の設定 ---
-        date_to = datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=9))) # JSTの現在日時
-        # date_from = date_to - timedelta(days=5*365) # 5年前 (デフォルト)
-        # 特定の期間を指定する場合 (例)
-        # date_from = datetime(2020, 1, 1, tzinfo=timezone(timedelta(hours=9))) 
-        # date_to = datetime(2020, 12, 31, tzinfo=timezone(timedelta(hours=9)))
-        ```
-    *   デフォルトでは、実行時から過去5年間のデータを取得しようとします。テスト実行時は短い期間（例: `timedelta(days=7)`）に設定することをおすすめします。
-3.  **実行:**
-    *   コマンドラインからスクリプトを実行します。
+1.  **スクリプトの配置:**
+    *   `Workspace_kissfx_indicators.py` が `Python/dopqLOL-scraping-economic-indicators-/` ディレクトリに配置されていることを確認します。(リポジトリをクローンした場合は既に配置済みです)
+2.  **実行:**
+    *   `GoldEventAnalyzer` プロジェクトのルートディレクトリから、以下のコマンドでスクリプトを実行します。
         ```bash
-        python Workspace_kissfx_indicators.py
+        python Python/dopqLOL-scraping-economic-indicators-/Workspace_kissfx_indicators.py
         ```
-4.  **出力確認:**
-    *   スクリプトと同じディレクトリに、指定期間のデータが含まれるCSVファイル (例: `kissfx_indicators_YYYYMMDD-YYYYMMDD.csv`) が生成されます。
-    *   コンソールには処理の進捗状況と最終的な取得件数が表示されます。
+    *   実行後、データの取得開始日と終了日を `YYYYMMDD` 形式で入力するよう求められます。
+3.  **出力結果の確認:**
+    *   処理が完了すると、プロジェクトルートに `kissfx_data` ディレクトリが作成（または使用）され、その中に経済指標データがCSVファイルとして保存されます。
+    *   HTML保存オプションを有効にした場合は、HTMLファイルも同ディレクトリに出力されます。
+    *   コンソールには、処理の進捗状況と最終的に取得されたイベント件数が表示されます。
 
-## 注意点
+## 注意事項
 
--   このスクリプトは `kissfx.com` のHTML構造に依存しています。ウェブサイトの構造が大幅に変更された場合、スクリプトの修正が必要になることがあります。
--   長期間のデータを取得する場合、ウェブサイトへのアクセス回数が多くなります。サーバーに過度な負荷をかけないよう、`time.sleep()` による待機時間が設けられていますが、常識の範囲内でご利用ください。
--   祝日などで経済指標の発表がない日付のページは存在しない場合があり、その場合はスキップされます。 
+-   本スクリプトは `kissfx.com` のウェブサイト構造に依存して動作します。サイト構造が大幅に変更された場合、スクリプトが正常に機能しなくなる可能性がありますので、その際は適宜修正が必要です。
+-   長期間のデータを一度に取得しようとすると、対象ウェブサイトへのアクセス回数が非常に多くなります。スクリプトにはサーバー負荷を軽減するための待機処理が含まれていますが、節度を持った利用を心がけてください。
+-   祝日など、経済指標の発表が予定されていない日付のページは存在しないことがあります。その場合、該当する日付のデータはスキップされます。 
