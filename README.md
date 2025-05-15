@@ -1,32 +1,3 @@
-# dopqLOL-scraping-economic-indicators-
-
-GOLDの経済指標影響分析アプリ (Android/Jetpack Compose)
-
-## 概要
-
-経済指標や要人発言がGOLD価格に与える影響を分析し、ボラティリティを予測するためのAndroidアプリケーションです。
-
-## 主な機能 (予定)
-
-- kissfx.comからの経済指標データの自動取得 (指定時間帯)
-- 過去データとの比較分析
-- 市場ボラティリティ状況に応じた予測分類
-- Jetpack ComposeによるモダンなUI
-
-## セットアップ
-
-(ここにビルドや実行の手順を記述)
-
-## 技術スタック
-
-- Kotlin
-- Android
-- Jetpack Compose
-- Coroutines
-- ViewModel
-- Room/DataStore
-- Ktor/Retrofit (検討中)
-
 # KissFX 経済指標データ抽出スクリプト
 
 ## 概要
